@@ -1,0 +1,84 @@
+#!/bin/sh
+
+source "$HOME/.config/ashot/config"
+
+usage() {
+    cat << EOF
+Usage:  ashot all|workspace|client|area [file]
+
+        ashot custom {options}
+        ashot custom -h
+EOF
+    exit 1
+}
+
+DESTINATION="$SCREENSHOT_DIR/$SCREENSHOT_MASK"
+EXTRA="- | wl-copy"
+
+get_area() {
+    slurp -w 0
+}
+
+get_workspace() {
+    hyprctl activeworkspace -j | jq -r '.monitor' | tr -d ' '
+}
+
+get_client() {
+    hyprctl activewindow -j | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"'
+}
+
+construct() {
+    local arguments="$1"
+    local extra="$2"
+    local scale="-s $SCREENSHOT_SCALE"
+    local format="-t $SCREENSHOT_FORMAT"
+    local compression="-l $SCREENSHOT_COMPRESSION"
+    local quality="$([ "$SCREENSHOT_FORMAT" = "jpeg" ] && echo "-q $SCREENSHOT_QUALITY")"
+    local cursors="$([ "$SCREENSHOT_CURSORS" = true ] && echo "-c")"
+
+    echo "grim $scale $format $compression $quality $cursors $arguments $extra"
+}
+
+inform() {
+    echo "Screenshot [$1] saved $2"
+}
+
+case "$1" in
+    "all")
+        ARGUMENTS=""
+        ;;
+    "workspace")
+        ARGUMENTS="-o \"$(get_workspace)\""
+        ;;
+    "client")
+        ARGUMENTS="-g \"$(get_client)\""
+        ;;
+    "area")
+        ARGUMENTS="-g \"$(get_area)\""
+        ;;
+    "custom") 
+        shift
+        echo "Run grim $@"
+        grim "$@"
+        exit 0
+        ;;
+    *)
+        usage
+        ;;
+esac
+
+case "$2" in
+    "file")
+        EXTRA="$DESTINATION"
+        ;;
+    *)
+        echo "... to clipboard!"
+        ;;
+esac
+
+if eval $(construct "$ARGUMENTS" "$EXTRA"); then
+    echo "Ashot did it!"
+else
+    echo "Ashot couldn't!"
+fi
+

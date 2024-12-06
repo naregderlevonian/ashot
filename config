@@ -1,0 +1,10 @@
+#!/bin/sh
+
+SCREENSHOT_DIR="$HOME/Pictures/Screenshots"
+SCREENSHOT_MASK="$(date +"%s.png")"
+
+SCREENSHOT_FORMAT="png"         # png, ppm or jpeg
+SCREENSHOT_QUALITY=80           # from 0 to 100 percent (for jpeg)
+SCREENSHOT_COMPRESSION=6        # from 0 to 9 (for png)
+SCREENSHOT_SCALE=1
+SCREENSHOT_CURSORS=false
