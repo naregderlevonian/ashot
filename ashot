@@ -15,8 +15,14 @@ EOF
 DESTINATION="$SCREENSHOT_DIR/$SCREENSHOT_MASK"
 EXTRA="- | wl-copy"
 
+SLURP_BACKGROUND_COLOR="#08080894"
+SLURP_SELECTION_COLOR="#00000000"
+
 get_area() {
-    slurp -w 0
+    slurp \
+        -b "$SLURP_BACKGROUND_COLOR" \
+        -s "$SLURP_SELECTION_COLOR" \
+        -w 0
 }
 
 get_workspace() {
