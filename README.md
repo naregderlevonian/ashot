@@ -1,4 +1,4 @@
-[Ashot](ashot.png)
+![Ashot](ashot.png)
 
 Ashot is a wrapper script for capturing screenshots in Hyprland.
 It offers various modes for taking screenshots and allows you to save them or copy them to your clipboard.
