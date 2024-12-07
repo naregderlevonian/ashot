@@ -22,15 +22,18 @@ get_area() {
     slurp \
         -b "$SLURP_BACKGROUND_COLOR" \
         -s "$SLURP_SELECTION_COLOR" \
-        -w 0
+        -w 0 \
+        || exit 1
 }
 
 get_workspace() {
-    hyprctl activeworkspace -j | jq -r '.monitor' | tr -d ' '
+    hyprctl activeworkspace -j | jq -r '.monitor' | tr -d ' ' \
+        || exit 1
 }
 
 get_client() {
-    hyprctl activewindow -j | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"'
+    hyprctl activewindow -j | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' \
+        || exit 1
 }
 
 construct() {
@@ -45,8 +48,13 @@ construct() {
     echo "grim $scale $format $compression $quality $cursors $arguments $extra"
 }
 
-inform() {
-    echo "Screenshot [$1] saved $2"
+success() {
+    echo "Ashot did it!"
+}
+
+error() {
+    echo "Ashot could't!"
+    exit 1
 }
 
 case "$1" in
@@ -54,13 +62,13 @@ case "$1" in
         ARGUMENTS=""
         ;;
     "workspace")
-        ARGUMENTS="-o \"$(get_workspace)\""
+        ARGUMENTS="-o \"$(get_workspace)\"" || error
         ;;
     "client")
-        ARGUMENTS="-g \"$(get_client)\""
+        ARGUMENTS="-g \"$(get_client)\"" || error
         ;;
     "area")
-        ARGUMENTS="-g \"$(get_area)\""
+        ARGUMENTS="-g \"$(get_area)\"" || error
         ;;
     "custom") 
         shift
@@ -82,9 +90,6 @@ case "$2" in
         ;;
 esac
 
-if eval $(construct "$ARGUMENTS" "$EXTRA"); then
-    echo "Ashot did it!"
-else
-    echo "Ashot couldn't!"
-fi
+eval $(construct "$ARGUMENTS" "$EXTRA") && success || error
+
 
