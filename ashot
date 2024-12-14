@@ -49,11 +49,15 @@ construct() {
 }
 
 success() {
-    echo "Ashot did it!"
+    local message="$(echo "of $1 $([ "$2" = "file" ] && echo "to $DESTINATION")")"
+    notify-send "Ashot" "Make screenshot $message"
+    echo "Ashot make screenshot $message "
 }
 
+
 error() {
-    echo "Ashot could't!"
+    notify-send "Ashot" "Couldn't"
+    echo "Ashot couldn't!"
     exit 1
 }
 
@@ -86,10 +90,8 @@ case "$2" in
         EXTRA="$DESTINATION"
         ;;
     *)
-        echo "... to clipboard!"
         ;;
 esac
 
-eval $(construct "$ARGUMENTS" "$EXTRA") && success || error
-
+eval $(construct "$ARGUMENTS" "$EXTRA") && success "$1" "$2" || error
 
